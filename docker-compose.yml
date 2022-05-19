@@ -1,7 +1,7 @@
 version: '3'
 services:
- sslReverseProxy:
-    container_name: sslReverseProxy
+ ssl:
+    container_name: ssl
     image: nginx
     ports:
          - "80:80"
@@ -14,8 +14,8 @@ services:
     restart: always
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"  
     networks:
-       my_network:
-          ipv4_address: 172.22.0.10
+       allnetwork:
+          ipv4_address: 172.20.0.10
 
  certbot:
     container_name: certbot
@@ -26,12 +26,12 @@ services:
     restart: unless-stopped
     entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;"
     depends_on:
-      - sslReverseProxy
+      - ssl
 
 
 networks:
   default:
     external:
-       name: my_network
-  my_network:
+       name: allnetwork
+  allnetwork:
     external: true
